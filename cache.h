@@ -1,3 +1,5 @@
+#ifndef  CACHE_H
+#define CACHE_H
 #include <stdbool.h>
 
 
@@ -17,7 +19,10 @@ typedef struct {
     int numSets;
 } Cache;
 
-Cache* initalizeCache(int numSets);
 
+Cache* initalizeCache(int numSets);
+Set* initializeSets(Set* sets, int numSets);
+
+#endif
 
 
