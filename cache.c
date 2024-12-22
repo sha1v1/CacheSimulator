@@ -86,3 +86,17 @@ int accessCache(Cache *cache, unsigned int addr, char *data){
     }
 }
 
+/**
+ * Display the current state of the cache.
+ * Format:
+ * Set <set number>: <valid bit>  <tag>  <block data>
+ */
+void displayCache(Cache *c){
+    int numSets = c->numSets;
+    
+    for(int i = 0; i < numSets; i++){
+        Line l = c->cacheSets[i].cacheLine;
+        printf("set %d: %d  %d  %s", i, l.validBit, l.tag, l.block);
+    }
+}
+
