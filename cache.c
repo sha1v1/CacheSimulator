@@ -5,7 +5,7 @@
 void initializeSets(Set* sets, int numSets){
     int i;
     for(i = 0; i < numSets; i++){
-        sets[i].cacheLine.validBit = 0;
+        sets[i].cacheLine.validBit = false;
         sets[i].cacheLine.tag = 0;
     }
 
@@ -54,7 +54,18 @@ int getTagBits(unsigned int addr, int numSets){
     return addr >> (5 + setBits);
 }
 
-int accessCache(Cache *cache, unsigned int addr){
+/**
+ * In case of a cache miss, fill the entire block with placeholder string "WrittenData"
+ * Writing a specific part of a block requires main memory to be simulated as well.
+ */
+void handleCacheMiss(Line *line, int tagbits){
+    line->validBit = true;
+    line->tag = tagbits;
+    strcpy(line->block, "WrittenData");
+
+}
+
+int accessCache(Cache *cache, unsigned int addr, char *data){
     // set index, block offset, and tag bits
     int setIndex = getSetIndex(addr, cache->numSets);
     int blockOffset = getBlockOffset(addr);
@@ -69,7 +80,8 @@ int accessCache(Cache *cache, unsigned int addr){
         return 1;
     }
     else{
-        printf("Cache miss at set %d\n", setIndex);
+        printf("Cache miss at set %d\n", setIndex); 
+        handleCacheMiss(line, tagBits);
         return 0;
     }
 }
