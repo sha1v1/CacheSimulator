@@ -1,1 +1,1 @@
-num_sets=8
+num_sets=4

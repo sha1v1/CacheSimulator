@@ -1,6 +1,9 @@
 #include "cache.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 void initializeSets(Set* sets, int numSets){
     int i;
@@ -9,7 +12,6 @@ void initializeSets(Set* sets, int numSets){
         sets[i].cacheLine.tag = 0;
     }
 
-    return sets;
 }
 
 
@@ -18,14 +20,14 @@ Cache* initalizeCache(int numSets){
     Cache* cache = (Cache*)malloc(sizeof(Cache));
     if(!cache){
         printf("Failed to allocate memory for Cache");
-        exit();
+        exit(1);
     }
     cache->numSets = numSets;
 
     Set* sets = (Set*)malloc(numSets * sizeof(Set));
     if (!sets){
         printf("Failed to allocate memory for sets");
-        exit();
+        exit(1);
     }
 
     cache->cacheSets = sets;
@@ -93,10 +95,11 @@ int accessCache(Cache *cache, unsigned int addr, char *data){
  */
 void displayCache(Cache *c){
     int numSets = c->numSets;
-    
+    printf("\n\n*****CACHE*****\n");
+    printf("       v  t   b\n");
     for(int i = 0; i < numSets; i++){
         Line l = c->cacheSets[i].cacheLine;
-        printf("set %d: %d  %d  %s", i, l.validBit, l.tag, l.block);
+        printf("set %d: %d  %d  %s\n", i, l.validBit, l.tag, l.block);
     }
 }
 
