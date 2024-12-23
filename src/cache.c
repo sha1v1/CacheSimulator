@@ -1,4 +1,4 @@
-#include "cache.h"
+#include "../include/cache.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
