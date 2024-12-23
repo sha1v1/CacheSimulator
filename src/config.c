@@ -18,7 +18,7 @@ CacheConfig *readConfigFile(CacheConfig *config){
     while(fgets(buffer, sizeof(buffer), configFile)){
         
         //to store the key-value pair in the current line
-        char key[24], value[24];
+        char key[25], value[25];
         sscanf(buffer, "%24[^=]=%24s", key, value);
         if(strcmp(key, "num_sets") == 0){
             config->numSets = atoi(value);
