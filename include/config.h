@@ -3,6 +3,7 @@
 
 typedef struct {
     int numSets;
+    int mainMemory;
 } CacheConfig;
 
 CacheConfig *readConfigFile(CacheConfig *config);

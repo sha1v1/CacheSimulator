@@ -23,6 +23,9 @@ CacheConfig *readConfigFile(CacheConfig *config){
         if(strcmp(key, "num_sets") == 0){
             config->numSets = atoi(value);
         }
+        else if(strcmp(key, "main_memory") == 0){
+            config->mainMemory = atoi(value);
+        }
         else{
             printf("Unknown key: %s\n", key);
             exit(1);
