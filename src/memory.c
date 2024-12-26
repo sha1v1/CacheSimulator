@@ -59,12 +59,19 @@ char readFromMemory(Memory *memory, int address){
 int writeToMemory(Memory *memory, int address, char value){
     int pageIdx =  address/memory->pageSize;
     int offset = address % memory->pageSize;
-
+    
     if (address >= memory->totalSize || address < 0) {
         printf("Error: Invalid memory address %d.\n", address);
         return 0;
     }
-
+    //incase the page we're writing to hadn't been initialized
+    if (memory->pageTable[pageIdx] == NULL){
+        memory->pageTable[pageIdx] = (char *)malloc(memory->pageSize * sizeof(char));
+        if (!memory->pageTable[pageIdx]) {
+            printf("Error: Page allocation failed.\n");
+            exit(1);
+        }
+    }
     memory->pageTable[pageIdx][offset] = value;
     printf("Memory at address %d changed to %d", address, value);
     return 1;
