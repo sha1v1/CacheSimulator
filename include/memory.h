@@ -11,7 +11,7 @@ typedef struct {
 
 void initializeMemory(Memory *memory, CacheConfig *config);
 int allocatePage(Memory *memory, int pageIndex);
-char readFromMemory(Memory *memory, int address);
+int readFromMemory(Memory *memory, int address);
 int writeToMemory(Memory *memory, int address, char value);
 void freeMemory(Memory *memory);
 

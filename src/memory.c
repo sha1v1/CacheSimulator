@@ -13,7 +13,7 @@ void initializeMemory(Memory *memory, CacheConfig *config){
     //allocate memory for array of page pointers
     memory->pageTable = (char **)calloc(memory->numPages, sizeof(char *));
     if(!memory->pageTable){
-        printf("Error: memoery allocation failed for page table");
+        printf("Error: memoery allocation failed for page table\n");
         exit(1);
     }
 
@@ -23,14 +23,14 @@ void initializeMemory(Memory *memory, CacheConfig *config){
 int allocatePage(Memory *memory, int pageIndex) {
     //check if memory has been initiliazed
     if(!memory || !memory->pageTable){
-        printf("Error: Attempting to write to uninitialized memory");
+        printf("Error: Attempting to write to uninitialized memory\n");
         return -1;
     }
 
     //check if the page index lies within memory's bounds
     if(pageIndex >= memory->numPages || pageIndex < 0){
-        printf("Error: Attempting to allocate page outside memory's bounds");
-        return -1;
+        printf("Error: Attempting to allocate page outside memory's bounds\n");
+        return -2;
     }
 
     //check if the page has been initiliazed
@@ -40,7 +40,7 @@ int allocatePage(Memory *memory, int pageIndex) {
         memory->pageTable[pageIndex] = (char *)malloc(memory->pageSize * sizeof(char));
         if (!memory->pageTable[pageIndex]) {
             printf("Error: Page allocation failed.\n");
-            return -1;
+            return -3;
         }
 
         // Populate with random non-zero values
@@ -53,12 +53,12 @@ int allocatePage(Memory *memory, int pageIndex) {
     return 1;
 }
 
-char readFromMemory(Memory *memory, int address){
+int readFromMemory(Memory *memory, int address){
     int pageIdx = address/memory->pageSize; //page index where the address is
     int offset = address % memory->pageSize; //offset within that page
 
     if(!memory || !memory->pageTable){
-        printf("Error: Attempting to write to uninitialized memory");
+        printf("Error: Attempting to write to uninitialized memory\n");
         return -1;
     }
     if(address >= memory->totalSize|| address < 0){
@@ -78,7 +78,7 @@ int writeToMemory(Memory *memory, int address, char value){
     int offset = address % memory->pageSize;
     
     if(!memory || !memory->pageTable){
-        printf("Error: Attempting to write to uninitialized memory");
+        printf("Error: Attempting to write to uninitialized memory\n");
         return 0;
     }
 
@@ -95,7 +95,7 @@ int writeToMemory(Memory *memory, int address, char value){
         }
     }
     memory->pageTable[pageIdx][offset] = value;
-    printf("Memory at address %d changed to %d", address, value);
+    printf("Memory at address %d changed to %d\n", address, value);
     return 1;
 }
 
