@@ -26,6 +26,13 @@ int allocatePage(Memory *memory, int pageIndex) {
         printf("Error: Attempting to write to uninitialized memory");
         return -1;
     }
+
+    //check if the page index lies within memory's bounds
+    if(pageIndex >= memory->numPages || pageIndex < 0){
+        printf("Error: Attempting to allocate page outside memory's bounds");
+        return -1;
+    }
+
     //check if the page has been initiliazed
     if (memory->pageTable[pageIndex] == NULL) {
 
