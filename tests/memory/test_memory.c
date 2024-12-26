@@ -44,6 +44,60 @@ void test_out_of_bounds_access(void) {
     int writeSuccess = writeToMemory(&memory, 2000, 42);
     TEST_ASSERT_EQUAL(0, writeSuccess);             // Should fail
 }
+//check for
+// 1. failed to initialize memory
+// 2. trying to allocated invalid page index (out of bounds)
+// 3. read from memory with out of bounds address/ uninitialized memory
+// 4. write to memory to an out of bounds address or uninitialized memory
+
+void test_uninitialized_memory(void){
+    Memory invalidMemory;
+    char val = readFromMemory(&invalidMemory, 100);
+    TEST_ASSERT_EQUAL(val, -1);
+
+    TEST_ASSERT_EQUAL(writeToMemory(&memory, 100, 10), 0);
+}
+
+void test_allocate_invalid_page_index(void){
+    int ret = allocatePage(&memory, 7);
+    TEST_ASSERT_EQUAL(ret, -1);
+}
+
+void test_allocate_page_invalid_memory(void){
+    Memory invalidMemory;
+    int ret = allocatePage(&invalidMemory, 1);
+    TEST_ASSERT_EQUAL(ret, -1);
+}
+
+void test_read_from_memory_uninitialized(void){
+    Memory invalidMemory;
+    int ret1 = readFromMemory(NULL, 2);
+    int ret2 = readFromMemory(&invalidMemory, 2);
+    TEST_ASSERT_EQUAL(ret1, -1);
+    TEST_ASSERT_EQUAL(ret2, -1);
+}
+
+void test_read_from_memory_invalid_address(void){
+    int ret1 = readFromMemory(&memory, 1024);
+    int ret2 = readFromMemory(&memory, -2);
+    TEST_ASSERT_EQUAL(ret1, -1);
+    TEST_ASSERT_EQUAL(ret2, -1);
+}
+
+void test_write_to_memory_invalid_address(void){
+    int ret1 = writeToMemory(&memory, -1, 'a');
+    int ret2 = writeToMemory(&memory, 2000, 'a');
+    TEST_ASSERT_EQUAL(ret1, 0);
+    TEST_ASSERT_EQUAL(ret2, 0);
+}
+
+void test_write_to_memory_uninitialized(void){
+    Memory invalidMemory;
+    int ret1 = writeToMemory(NULL, 2, 'a');
+    int ret2 = writeToMemory(&invalidMemory, 2, 'a');
+    TEST_ASSERT_EQUAL(ret1, 0);
+    TEST_ASSERT_EQUAL(ret2, 0);
+}
 
 int main(void) {
     UNITY_BEGIN();
@@ -52,6 +106,12 @@ int main(void) {
     RUN_TEST(test_read_from_memory);
     RUN_TEST(test_write_to_memory);
     RUN_TEST(test_out_of_bounds_access);
-
+    RUN_TEST(test_uninitialized_memory);
+    RUN_TEST(test_allocate_invalid_page_index);
+    RUN_TEST(test_allocate_page_invalid_memory);
+    RUN_TEST(test_read_from_memory_uninitialized);
+    RUN_TEST(test_read_from_memory_invalid_address);
+    RUN_TEST(test_write_to_memory_invalid_address);
+    RUN_TEST(test_write_to_memory_uninitialized);
     return UNITY_END();
 }
