@@ -70,3 +70,14 @@ int writeToMemory(Memory *memory, int address, char value){
     return 1;
 }
 
+void freeMemory(Memory *memory){
+    for (int i = 0; i < memory->numPages; i++) {
+        if (memory->pageTable[i] != NULL) {
+            free(memory->pageTable[i]);  //free eacch allocated page
+        }
+    }
+    free(memory->pageTable);  //free the page table
+    memory->pageTable = NULL;
+
+}
+
