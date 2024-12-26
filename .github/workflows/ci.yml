@@ -23,7 +23,7 @@ jobs:
 
       # Step 3: Compile tests
       - name: Compile Tests
-        run: gcc -o test_memory tests/test_memory.c src/memory.c unity/unity.c
+        run: gcc -o test_memory tests/memory/test_memory.c src/memory.c src/unity/unity.c
 
       # Step 4: Run tests
       - name: Run Tests
