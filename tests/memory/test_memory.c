@@ -2,7 +2,7 @@
 #include "../../include/config.h"
 #include "../../src/unity/unity.h"
 #include "../../include/memory.h"
-
+#include <stdio.h>
 
 Memory memory;
 CacheConfig config;
@@ -51,52 +51,55 @@ void test_out_of_bounds_access(void) {
 // 4. write to memory to an out of bounds address or uninitialized memory
 
 void test_uninitialized_memory(void){
-    Memory invalidMemory;
-    char val = readFromMemory(&invalidMemory, 100);
-    TEST_ASSERT_EQUAL(val, -1);
+    //this is zero initialialization. This ensures pageTable = NULL
+    //and other fields are zero.
+    //leaving "invalidMemory" in an uninitialized state might cause pageTable to point to garbalge values.
+    Memory invalidMemory = {0};
+    int val = readFromMemory(&invalidMemory, 101);
+    TEST_ASSERT_EQUAL(-1, val);
 
-    TEST_ASSERT_EQUAL(writeToMemory(&memory, 100, 10), 0);
+    TEST_ASSERT_EQUAL(writeToMemory(&invalidMemory, 100, 10), 0);
 }
 
 void test_allocate_invalid_page_index(void){
     int ret = allocatePage(&memory, 7);
-    TEST_ASSERT_EQUAL(ret, -1);
+    TEST_ASSERT_EQUAL(-2, ret);
 }
 
 void test_allocate_page_invalid_memory(void){
-    Memory invalidMemory;
+    Memory invalidMemory = {0};
     int ret = allocatePage(&invalidMemory, 1);
-    TEST_ASSERT_EQUAL(ret, -1);
+    TEST_ASSERT_EQUAL(-1, ret);
 }
 
 void test_read_from_memory_uninitialized(void){
-    Memory invalidMemory;
+    Memory invalidMemory = {0};
     int ret1 = readFromMemory(NULL, 2);
     int ret2 = readFromMemory(&invalidMemory, 2);
-    TEST_ASSERT_EQUAL(ret1, -1);
-    TEST_ASSERT_EQUAL(ret2, -1);
+    TEST_ASSERT_EQUAL(-1, ret1);
+    TEST_ASSERT_EQUAL(-1, ret2);
 }
 
 void test_read_from_memory_invalid_address(void){
     int ret1 = readFromMemory(&memory, 1024);
     int ret2 = readFromMemory(&memory, -2);
-    TEST_ASSERT_EQUAL(ret1, -1);
-    TEST_ASSERT_EQUAL(ret2, -1);
+    TEST_ASSERT_EQUAL(-1, ret1);
+    TEST_ASSERT_EQUAL(-1, ret2);
 }
 
 void test_write_to_memory_invalid_address(void){
     int ret1 = writeToMemory(&memory, -1, 'a');
     int ret2 = writeToMemory(&memory, 2000, 'a');
-    TEST_ASSERT_EQUAL(ret1, 0);
-    TEST_ASSERT_EQUAL(ret2, 0);
+    TEST_ASSERT_EQUAL(0, ret1);
+    TEST_ASSERT_EQUAL(0, ret2);
 }
 
 void test_write_to_memory_uninitialized(void){
-    Memory invalidMemory;
+    Memory invalidMemory = {0};
     int ret1 = writeToMemory(NULL, 2, 'a');
     int ret2 = writeToMemory(&invalidMemory, 2, 'a');
-    TEST_ASSERT_EQUAL(ret1, 0);
-    TEST_ASSERT_EQUAL(ret2, 0);
+    TEST_ASSERT_EQUAL(0, ret1);
+    TEST_ASSERT_EQUAL(0, ret2);
 }
 
 int main(void) {
