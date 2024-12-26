@@ -44,7 +44,7 @@ char readFromMemory(Memory *memory, int address){
     int pageIdx = address/memory->pageSize; //page index where the address is
     int offset = address % memory->pageSize; //offset within that page
     
-    if(pageIdx >= memory->numPages || address < 0){
+    if(address >= memory->totalSize|| address < 0){
         printf("Invalid Memory address %d\n", address);
         return -1;
     }
@@ -60,7 +60,7 @@ int writeToMemory(Memory *memory, int address, char value){
     int pageIdx =  address/memory->pageSize;
     int offset = address % memory->pageSize;
 
-    if (pageIdx >= memory->numPages || address < 0) {
+    if (address >= memory->totalSize || address < 0) {
         printf("Error: Invalid memory address %d.\n", address);
         return 0;
     }
@@ -71,6 +71,12 @@ int writeToMemory(Memory *memory, int address, char value){
 }
 
 void freeMemory(Memory *memory){
+
+    if (!memory || !memory->pageTable) {
+        printf("Memory already freed or not initialized.\n");
+        return;
+    }
+
     for (int i = 0; i < memory->numPages; i++) {
         if (memory->pageTable[i] != NULL) {
             free(memory->pageTable[i]);  //free eacch allocated page
