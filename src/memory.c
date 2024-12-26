@@ -54,13 +54,14 @@ int allocatePage(Memory *memory, int pageIndex) {
 }
 
 int readFromMemory(Memory *memory, int address){
-    int pageIdx = address/memory->pageSize; //page index where the address is
-    int offset = address % memory->pageSize; //offset within that page
-
     if(!memory || !memory->pageTable){
         printf("Error: Attempting to write to uninitialized memory\n");
         return -1;
     }
+    
+    int pageIdx = address/memory->pageSize; //page index where the address is
+    int offset = address % memory->pageSize; //offset within that page
+
     if(address >= memory->totalSize|| address < 0){
         printf("Invalid Memory address %d\n", address);
         return -1;
@@ -74,13 +75,14 @@ int readFromMemory(Memory *memory, int address){
 }
 
 int writeToMemory(Memory *memory, int address, char value){
-    int pageIdx =  address/memory->pageSize;
-    int offset = address % memory->pageSize;
-    
     if(!memory || !memory->pageTable){
         printf("Error: Attempting to write to uninitialized memory\n");
         return 0;
     }
+
+    int pageIdx =  address/memory->pageSize;
+    int offset = address % memory->pageSize;
+    
 
     if (address >= memory->totalSize || address < 0) {
         printf("Error: Invalid memory address %d.\n", address);
