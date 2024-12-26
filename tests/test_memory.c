@@ -1,7 +1,7 @@
-#include "../../include/memory.h"
-#include "../../include/config.h"
-#include "../../src/unity/unity.h"
-#include "../../include/memory.h"
+#include "../include/memory.h"
+#include "../include/config.h"
+#include "../src/unity/unity.h"
+#include "../include/memory.h"
 #include <stdio.h>
 
 Memory memory;
