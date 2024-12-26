@@ -1,5 +1,6 @@
 #ifndef MEMORY_H
 #define MEMORY_H
+#include "config.h"
 
 typedef struct {
     char **pageTable;  // Array of page pointers

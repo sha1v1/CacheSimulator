@@ -66,7 +66,7 @@ int writeToMemory(Memory *memory, int address, char value){
     }
 
     memory->pageTable[pageIdx][offset] = value;
-    printf("Memory at address % changed to %d", address, value);
+    printf("Memory at address %d changed to %d", address, value);
     return 1;
 }
 
