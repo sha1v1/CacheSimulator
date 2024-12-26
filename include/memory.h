@@ -10,7 +10,7 @@ typedef struct {
 } Memory;
 
 void initializeMemory(Memory *memory, CacheConfig *config);
-void allocatePage(Memory *memory, int pageIndex);
+int allocatePage(Memory *memory, int pageIndex);
 char readFromMemory(Memory *memory, int address);
 int writeToMemory(Memory *memory, int address, char value);
 void freeMemory(Memory *memory);

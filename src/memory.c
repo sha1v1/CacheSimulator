@@ -20,7 +20,12 @@ void initializeMemory(Memory *memory, CacheConfig *config){
 
 }
 
-void allocatePage(Memory *memory, int pageIndex) {
+int allocatePage(Memory *memory, int pageIndex) {
+    //check if memory has been initiliazed
+    if(!memory || !memory->pageTable){
+        printf("Error: Attempting to write to uninitialized memory");
+        return -1;
+    }
     //check if the page has been initiliazed
     if (memory->pageTable[pageIndex] == NULL) {
 
@@ -28,7 +33,7 @@ void allocatePage(Memory *memory, int pageIndex) {
         memory->pageTable[pageIndex] = (char *)malloc(memory->pageSize * sizeof(char));
         if (!memory->pageTable[pageIndex]) {
             printf("Error: Page allocation failed.\n");
-            exit(1);
+            return -1;
         }
 
         // Populate with random non-zero values
@@ -38,6 +43,7 @@ void allocatePage(Memory *memory, int pageIndex) {
 
         printf("Page %d allocated and initialized.\n", pageIndex);
     }
+    return 1;
 }
 
 char readFromMemory(Memory *memory, int address){
