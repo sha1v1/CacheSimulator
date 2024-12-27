@@ -101,6 +101,19 @@ void updateCache(Cache *cache, int setIndex, int tagBits, const char *blockData)
     strcpy(line->block, blockData);  // Copy data into cache block
 }
 
+void freeCache(Cache *cache) {
+    if (!cache) return;  // Ensure the cache pointer is valid
+
+    // Free the array of sets
+    if (cache->cacheSets) {
+        free(cache->cacheSets);
+        cache->cacheSets = NULL;  // Avoid dangling pointers
+    }
+
+    // Free the cache structure itself
+    free(cache);
+}
+
 /**
  * Display the current state of the cache.
  * Format:

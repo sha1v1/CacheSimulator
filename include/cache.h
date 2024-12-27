@@ -29,6 +29,7 @@ int getTagBits(unsigned int addr, int numSets);
 int accessCache(Cache *cache, unsigned int addr);
 void updateCache(Cache *cache, int setIndex, int tagBits, const char *blockData);
 void displayCache(Cache *c);
+void freeCache(Cache *cache);
 
 #endif
 
