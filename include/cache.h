@@ -26,8 +26,8 @@ void initializeSets(Set* sets, int numSets);
 int getSetIndex(unsigned int addr, int numSets);
 int getBlockOffset(unsigned int addr);
 int getTagBits(unsigned int addr, int numSets);
-void handleCacheMiss(Memory *memory, int addr, Line *line, int tagbits);
-int accessCache(Cache *cache, Memory *memory,unsigned int addr);
+int accessCache(Cache *cache, unsigned int addr);
+void updateCache(Cache *cache, int setIndex, int tagBits, const char *blockData);
 void displayCache(Cache *c);
 
 #endif

@@ -61,19 +61,19 @@ int getTagBits(unsigned int addr, int numSets){
  * In case of a cache miss, fetch the line of data from memory 
  * and populate the said block
  */
-void handleCacheMiss(Memory *memory, int addr, Line *line, int tagbits){
-    line->validBit = true;
-    line->tag = tagbits;
+// void handleCacheMiss(int addr, Line *line, int tagbits){
+//     line->validBit = true;
+//     line->tag = tagbits;
 
-    int blockStartAddress = addr & ~31;
-    for (int i = 0; i < 32; i++) {       // 32 bytes per block
-        line->block[i] = readFromMemory(memory, blockStartAddress + i);
-    }
-    printf("Loaded block from main memory to cache\n");
+//     int blockStartAddress = addr & ~31;
+//     for (int i = 0; i < 32; i++) {       // 32 bytes per block
+//         line->block[i] = readFromMemory(memory, blockStartAddress + i);
+//     }
+//     printf("Loaded block from main memory to cache\n");
 
-}
+// }
 
-int accessCache(Cache *cache, Memory *memory, unsigned int addr){
+int accessCache(Cache *cache, unsigned int addr){
     // set index, block offset, and tag bits
     int setIndex = getSetIndex(addr, cache->numSets);
     int blockOffset = getBlockOffset(addr);
@@ -89,9 +89,16 @@ int accessCache(Cache *cache, Memory *memory, unsigned int addr){
     }
     else{
         printf("Cache miss at set %d\n", setIndex); 
-        handleCacheMiss(memory, addr, line, tagBits);
+        // handleCacheMiss(memory, addr, line, tagBits);
         return 0;
     }
+
+}
+void updateCache(Cache *cache, int setIndex, int tagBits, const char *blockData) {
+    Line *line = &(cache->cacheSets[setIndex].cacheLine);
+    line->validBit = true;
+    line->tag = tagBits;
+    strcpy(line->block, blockData);  // Copy data into cache block
 }
 
 /**
