@@ -76,6 +76,12 @@ int getTagBits(unsigned int addr, int numSets){
 // }
 
 int accessCache(Cache *cache, unsigned int addr){
+    //check if pointer is valid
+    if (!cache || !cache->cacheSets) {
+        printf("Error: Attempting to access an uninitialized cache.\n");
+        return -1;  
+    }
+
     // set index, block offset, and tag bits
     int setIndex = getSetIndex(addr, cache->numSets);
     int blockOffset = getBlockOffset(addr);
@@ -96,6 +102,8 @@ int accessCache(Cache *cache, unsigned int addr){
     }
 
 }
+
+
 void updateCache(Cache *cache, int setIndex, int tagBits, const char *blockData) {
     Line *line = &(cache->cacheSets[setIndex].cacheLine);
     line->validBit = true;

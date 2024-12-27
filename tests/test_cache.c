@@ -23,7 +23,7 @@ void test_initialize_cache(void){
         TEST_ASSERT_EQUAL_STRING("", line.block);
     }
 
-    freeCache(cache);
+    // freeCache(cache);
 }
 
 void test_cache_hit(void){
@@ -69,7 +69,7 @@ void test_invalid_cache_access(void) {
 
     int result = accessCache(invalidCache, addr);
 
-    TEST_ASSERT_EQUAL(0, result);  // Expect cache access to fail gracefully
+    TEST_ASSERT_EQUAL(-1, result);  // Expect cache access to fail gracefully
 }
 
 int main(void) {
