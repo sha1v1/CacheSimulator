@@ -1,5 +1,6 @@
 #include "../src/unity/unity.h"
 #include "../include/cache.h"
+#include <string.h>
 
 Cache *cache;
 
