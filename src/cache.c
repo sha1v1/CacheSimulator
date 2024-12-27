@@ -11,6 +11,8 @@ void initializeSets(Set* sets, int numSets){
     for(i = 0; i < numSets; i++){
         sets[i].cacheLine.validBit = false;
         sets[i].cacheLine.tag = 0;
+        (sets[i].cacheLine.block, 0, sizeof(sets[i].cacheLine.block)); 
+
     }
 
 }
