@@ -31,7 +31,7 @@ jobs:
       
       # Step 5: Compile cache tests
       - name: Compile Cache Tests
-        run: gcc -o test_cache tests/test_cache.c src/cache.c src/unity/unity.c -Iinclude
+        run: gcc -o test_cache tests/test_cache.c src/cache.c src/unity/unity.c -Iinclude -lm
 
       # Step 6: Run cache tests
       - name: Run Cache Tests
