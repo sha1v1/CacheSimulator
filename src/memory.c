@@ -101,6 +101,18 @@ int writeToMemory(Memory *memory, int address, char value){
     return 1;
 }
 
+
+//since I am calling malloc inside, the caller will have to free the memory.
+char *fetchBlockFromMemory(Memory *memory, unsigned int addr) {
+    int blockStartAddr = addr & ~31;  // Align to block start
+    char *blockData = (char *)malloc(32 * sizeof(char));
+    for (int i = 0; i < 32; i++) {
+        blockData[i] = readFromMemory(memory, blockStartAddr + i);
+    }
+    return blockData;
+}
+
+
 void freeMemory(Memory *memory){
 
     if (!memory || !memory->pageTable) {

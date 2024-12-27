@@ -13,6 +13,7 @@ void initializeMemory(Memory *memory, CacheConfig *config);
 int allocatePage(Memory *memory, int pageIndex);
 int readFromMemory(Memory *memory, int address);
 int writeToMemory(Memory *memory, int address, char value);
+char *fetchBlockFromMemory(Memory *memory, unsigned int addr);
 void freeMemory(Memory *memory);
 
 #endif
