@@ -21,10 +21,18 @@ jobs:
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y gcc make
 
-      # Step 3: Compile tests
+      # Step 3: Compile memory tests
       - name: Compile Tests
         run: gcc -o test_memory tests/test_memory.c src/memory.c src/unity/unity.c
 
-      # Step 4: Run tests
+      # Step 4: Run memory tests
       - name: Run Tests
         run: ./test_memory
+      
+      # Step 5: Compile cache tests
+      - name: Compile Cache Tests
+        run: gcc -o test_cache tests/test_cache.c src/cache.c src/unity/unity.c -Iinclude
+
+      # Step 6: Run cache tests
+      - name: Run Cache Tests
+        run: ./test_cache
