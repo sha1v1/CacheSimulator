@@ -1,4 +1,5 @@
 #include "../include/cache.h"
+#include "../include/memory.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -57,17 +58,22 @@ int getTagBits(unsigned int addr, int numSets){
 }
 
 /**
- * In case of a cache miss, fill the entire block with placeholder string "WrittenData"
- * Writing a specific part of a block requires main memory to be simulated as well.
+ * In case of a cache miss, fetch the line of data from memory 
+ * and populate the said block
  */
-void handleCacheMiss(Line *line, int tagbits){
+void handleCacheMiss(Memory *memory, int addr, Line *line, int tagbits){
     line->validBit = true;
     line->tag = tagbits;
-    strcpy(line->block, "WrittenData");
+
+    int blockStartAddress = addr & ~31;
+    for (int i = 0; i < 32; i++) {       // 32 bytes per block
+        line->block[i] = readFromMemory(memory, blockStartAddress + i);
+    }
+    printf("Loaded block from main memory to cache\n");
 
 }
 
-int accessCache(Cache *cache, unsigned int addr, char *data){
+int accessCache(Cache *cache, Memory *memory, unsigned int addr){
     // set index, block offset, and tag bits
     int setIndex = getSetIndex(addr, cache->numSets);
     int blockOffset = getBlockOffset(addr);
@@ -79,11 +85,11 @@ int accessCache(Cache *cache, unsigned int addr, char *data){
     //check valid bit and tagbits
     if(line->tag == tagBits && line->validBit){
         printf("Cache hit at set %d, block offset %d\n", setIndex, blockOffset);
-        return 1;
+        return 1; //cache hit
     }
     else{
         printf("Cache miss at set %d\n", setIndex); 
-        handleCacheMiss(line, tagBits);
+        handleCacheMiss(memory, addr, line, tagBits);
         return 0;
     }
 }

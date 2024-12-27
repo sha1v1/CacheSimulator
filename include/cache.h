@@ -1,6 +1,7 @@
 #ifndef  CACHE_H
 #define CACHE_H
 #include <stdbool.h>
+#include "memory.h"
 
 
 typedef struct {
@@ -25,8 +26,8 @@ void initializeSets(Set* sets, int numSets);
 int getSetIndex(unsigned int addr, int numSets);
 int getBlockOffset(unsigned int addr);
 int getTagBits(unsigned int addr, int numSets);
-void handleCacheMiss(Line *line, int tagbits);
-int accessCache(Cache *cache, unsigned int addr, char *data);
+void handleCacheMiss(Memory *memory, int addr, Line *line, int tagbits);
+int accessCache(Cache *cache, Memory *memory,unsigned int addr);
 void displayCache(Cache *c);
 
 #endif
