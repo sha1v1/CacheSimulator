@@ -9,7 +9,7 @@ typedef struct {
     int numPages;      // Total number of pages
 } Memory;
 
-void initializeMemory(Memory *memory, CacheConfig *config);
+void initializeMemory(Memory *memory, Config *config);
 int allocatePage(Memory *memory, int pageIndex);
 int readFromMemory(Memory *memory, int address);
 int writeToMemory(Memory *memory, int address, char value);
