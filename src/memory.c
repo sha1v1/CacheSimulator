@@ -5,7 +5,7 @@
 #include <string.h>
 
 //initialize main memory
-void initializeMemory(Memory *memory, CacheConfig *config){
+void initializeMemory(Memory *memory, Config *config){
     memory->totalSize = config->mainMemorySize;
     memory->pageSize = 256; //fixed page size
     memory->numPages = (memory->totalSize + memory->pageSize - 1)/memory->pageSize; //round up

@@ -4,7 +4,7 @@
 #include "../include/config.h"
 
 int main() {
-    CacheConfig config;
+    Config config;
     Cache *cache;
 
     // Read configuration

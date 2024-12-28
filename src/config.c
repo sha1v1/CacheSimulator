@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-CacheConfig *readConfigFile(CacheConfig *config){
+Config *readConfigFile(Config *config){
     //open config file
     FILE* configFile = fopen("config.txt", "r");
     if(!configFile){

@@ -4,8 +4,8 @@
 typedef struct {
     int numSets;
     int mainMemorySize;
-} CacheConfig;
+} Config;
 
-CacheConfig *readConfigFile(CacheConfig *config);
+Config *readConfigFile(Config *config);
 
 #endif 

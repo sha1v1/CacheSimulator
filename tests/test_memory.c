@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 Memory memory;
-CacheConfig config;
+Config config;
 
 void setUp(void){
     config.mainMemorySize = 1024;
