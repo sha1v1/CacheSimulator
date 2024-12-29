@@ -26,6 +26,9 @@ Config *readConfigFile(Config *config){
         else if(strcmp(key, "main_memory_size") == 0){
             config->mainMemorySize = atoi(value);
         }
+        else if(strcmp(key, "lines_per_set") == 0){
+            config->linesPerSet = atoi(value);
+        }
         else{
             printf("Unknown key: %s\n", key);
             exit(1);

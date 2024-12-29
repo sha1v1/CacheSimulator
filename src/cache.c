@@ -6,28 +6,44 @@
 #include <string.h>
 
 
-void initializeSets(Set* sets, int numSets){
-    int i;
-    for(i = 0; i < numSets; i++){
-        sets[i].cacheLine.validBit = false;
-        sets[i].cacheLine.tag = 0;
-        (sets[i].cacheLine.block, 0, sizeof(sets[i].cacheLine.block)); 
+void initializeSets(Set *sets, int numSets, int linesPerSet){
+    
+    // outer loop initializes each set
+    for(int i = 0; i < numSets; i++){
+        sets[i].linesPerSet = linesPerSet;
+        sets[i].cacheLines = (Line *)malloc(linesPerSet * sizeof(Line));
+        if(!sets[i].cacheLines){
+            printf("Failed to allocate memory for lines in set %d", i);
+            exit(1);
+        }
+        
+        //now initialize each line within a set
+        for (int j = 0; j < linesPerSet; j++){
+            sets[i].cacheLines[j].validBit = false;
+            sets[i].cacheLines[j].tag = 0;
+            memset(sets[i].cacheLines[j].block, 0, sizeof(sets[i].cacheLines[j].block));
+        }
 
     }
 
 }
 
 
-Cache* initalizeCache(int numSets){
-    
+Cache* initalizeCache(Config *config){
+    if(!config){
+        printf("Error: Configurations have not been set.");
+        return NULL;
+    }
+
     Cache* cache = (Cache*)malloc(sizeof(Cache));
     if(!cache){
         printf("Failed to allocate memory for Cache");
         exit(1);
     }
-    cache->numSets = numSets;
+    cache->numSets = config->numSets;
+    cache->linesPerSet = config->linesPerSet;
 
-    Set* sets = (Set*)malloc(numSets * sizeof(Set));
+    Set* sets = (Set*)malloc(cache->numSets * sizeof(Set));
     if (!sets){
         printf("Failed to allocate memory for sets");
         exit(1);
@@ -35,7 +51,8 @@ Cache* initalizeCache(int numSets){
 
     cache->cacheSets = sets;
 
-    initializeSets(cache->cacheSets, numSets);
+    //initialize all sets
+    initializeSets(cache->cacheSets, cache->numSets, cache->linesPerSet);
 
     return cache;
 
@@ -75,7 +92,7 @@ int getTagBits(unsigned int addr, int numSets){
 
 // }
 
-int accessCache(Cache *cache, unsigned int addr){
+int accessCache(Cache *cache, unsigned int addr, const char *data){
     //check if pointer is valid
     if (!cache || !cache->cacheSets) {
         printf("Error: Attempting to access an uninitialized cache.\n");
@@ -87,25 +104,54 @@ int accessCache(Cache *cache, unsigned int addr){
     int blockOffset = getBlockOffset(addr);
     int tagBits = getTagBits(addr, cache->numSets);
 
-    //get the line at the corresponding set index
-    Line *line = &(cache->cacheSets[setIndex].cacheLine);
+    Set *curSet = &(cache->cacheSets[setIndex]);
 
-    //check valid bit and tagbits
-    if(line->tag == tagBits && line->validBit){
+    //get the lines at the corresponding set index
+    Line *lines = curSet->cacheLines;
+
+    //iterate through all lines
+    for(int i = 0; i < curSet->linesPerSet; i++){
+        //check valid bit and tagbits
+        if(lines[i].tag == tagBits && lines[i].validBit){
         printf("Cache hit at set %d, block offset %d\n", setIndex, blockOffset);
         return 1; //cache hit
+        }
     }
-    else{
-        printf("Cache miss at set %d\n", setIndex); 
-        // handleCacheMiss(memory, addr, line, tagBits);
-        return 0;
+
+    printf("Cache miss at set %d\n", setIndex); 
+
+    //now look for emptyline or a line to replace
+    Line *lineToReplace = NULL;
+    for (int i = 0; i < curSet->linesPerSet; i++) {
+        if (!lines[i].validBit) {
+            lineToReplace = &lines[i];   // Found an empty line
+            break;
+        }
     }
+
+    //if we don't find one, replace one
+    if(lineToReplace == NULL){
+        lineToReplace = randomReplacement(curSet);
+    }
+
+    //update the chosen line
+    updateCache(lineToReplace, tagBits, data);
+
+    return 0;
+    
+
+}
+
+Line *randomReplacement(Set *set){
+    // this runs if an empty line wasn't found
+    int lineToReplaceIndex = rand() % set->linesPerSet;
+    return &set->cacheLines[lineToReplaceIndex];
 
 }
 
 
-void updateCache(Cache *cache, int setIndex, int tagBits, const char *blockData) {
-    Line *line = &(cache->cacheSets[setIndex].cacheLine);
+void updateCache(Line *line, int tagBits, const char *blockData) {
+    // Line *line = &(cache->cacheSets[setIndex].cacheLines);
     line->validBit = true;
     line->tag = tagBits;
     strcpy(line->block, blockData);  // Copy data into cache block
@@ -115,12 +161,15 @@ void freeCache(Cache *cache) {
     if (!cache) return;  // Ensure the cache pointer is valid
 
     // Free the array of sets
-    if (cache->cacheSets) {
-        free(cache->cacheSets);
-        cache->cacheSets = NULL;  // Avoid dangling pointers
+    for (int i = 0; i < cache->numSets; i++) {
+        Set *set = &(cache->cacheSets[i]);
+        if (set->cacheLines) {
+            free(set->cacheLines);
+            set->cacheLines = NULL;
+        }
     }
 
-    // Free the cache structure itself
+    free(cache->cacheSets);
     free(cache);
 }
 
@@ -129,13 +178,27 @@ void freeCache(Cache *cache) {
  * Format:
  * Set <set number>: <valid bit>  <tag>  <block data>
  */
-void displayCache(Cache *c){
-    int numSets = c->numSets;
-    printf("\n\n*****CACHE*****\n");
-    printf("       v  t   b\n");
-    for(int i = 0; i < numSets; i++){
-        Line l = c->cacheSets[i].cacheLine;
-        printf("set %d: %d  %d  %s\n", i, l.validBit, l.tag, l.block);
+void displayCache(Cache *cache) {
+    if (!cache || !cache->cacheSets) {
+        printf("Error: Cache is not initialized.\n");
+        return;
     }
+
+    int numSets = cache->numSets;
+    int linesPerSet = cache->linesPerSet;
+
+    printf("\n\n*****CACHE STATE*****\n");
+    printf("Set | Line | Valid | Tag     | Block Data\n");
+    printf("-----------------------------------------\n");
+
+    for (int i = 0; i < numSets; i++) {
+        Set *set = &cache->cacheSets[i];
+        for (int j = 0; j < linesPerSet; j++) {
+            Line *line = &set->cacheLines[j];
+            printf("%3d | %4d | %5d | %7u | %s\n", 
+                   i, j, line->validBit, line->tag, line->block);
+        }
+    }
+    printf("-----------------------------------------\n");
 }
 

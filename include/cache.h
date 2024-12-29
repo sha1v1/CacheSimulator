@@ -12,22 +12,25 @@ typedef struct {
 } Line;
 
 typedef struct {
-    Line cacheLine; //just one coz direct mapped
+    Line *cacheLines; //just one coz direct mapped
+    int linesPerSet;
 } Set;
 
 typedef struct {
     Set* cacheSets;
     int numSets;
+    int linesPerSet; //just easy to access lol
 } Cache;
 
 
-Cache* initalizeCache(int numSets);
-void initializeSets(Set* sets, int numSets);
+Cache* initalizeCache(Config *config);
+void initializeSets(Set* sets, int numSets, int linesPerSet);
 int getSetIndex(unsigned int addr, int numSets);
 int getBlockOffset(unsigned int addr);
 int getTagBits(unsigned int addr, int numSets);
-int accessCache(Cache *cache, unsigned int addr);
-void updateCache(Cache *cache, int setIndex, int tagBits, const char *blockData);
+int accessCache(Cache *cache, unsigned int addr, const char *data);
+Line *randomReplacement(Set *set);
+void updateCache(Line *line, int tagBits, const char *blockData);
 void displayCache(Cache *c);
 void freeCache(Cache *cache);
 

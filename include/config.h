@@ -4,6 +4,7 @@
 typedef struct {
     int numSets;
     int mainMemorySize;
+    int linesPerSet;
 } Config;
 
 Config *readConfigFile(Config *config);
