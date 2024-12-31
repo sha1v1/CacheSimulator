@@ -8,7 +8,7 @@ typedef struct {
     bool validBit;
     unsigned int tag;
     char block[32];
-    
+    unsigned int lastAccessTime;
 } Line;
 
 typedef struct {
@@ -28,8 +28,9 @@ void initializeSets(Set* sets, int numSets, int linesPerSet);
 int getSetIndex(unsigned int addr, int numSets);
 int getBlockOffset(unsigned int addr);
 int getTagBits(unsigned int addr, int numSets);
-int accessCache(Cache *cache, unsigned int addr, const char *data);
+int accessCache(Cache *cache, unsigned int addr, const char *data, const char policy[10]);
 Line *randomReplacement(Set *set);
+Line* leastRecentlyUsed(Set *set);
 void updateCache(Line *line, int tagBits, const char *blockData);
 void displayCache(Cache *c);
 void freeCache(Cache *cache);

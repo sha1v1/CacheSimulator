@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+//counter to manage last access times for lines in a set
+unsigned int globalTime = 0;
 
 void initializeSets(Set *sets, int numSets, int linesPerSet){
     
@@ -21,6 +23,7 @@ void initializeSets(Set *sets, int numSets, int linesPerSet){
         for (int j = 0; j < linesPerSet; j++){
             sets[i].cacheLines[j].validBit = false;
             sets[i].cacheLines[j].tag = 0;
+            sets[i].cacheLines[j].lastAccessTime = 0;
             memset(sets[i].cacheLines[j].block, 0, sizeof(sets[i].cacheLines[j].block));
         }
 
@@ -92,7 +95,7 @@ int getTagBits(unsigned int addr, int numSets){
 
 // }
 
-int accessCache(Cache *cache, unsigned int addr, const char *data){
+int accessCache(Cache *cache, unsigned int addr, const char *data, const char policy[10]){
     //check if pointer is valid
     if (!cache || !cache->cacheSets) {
         printf("Error: Attempting to access an uninitialized cache.\n");
@@ -113,8 +116,9 @@ int accessCache(Cache *cache, unsigned int addr, const char *data){
     for(int i = 0; i < curSet->linesPerSet; i++){
         //check valid bit and tagbits
         if(lines[i].tag == tagBits && lines[i].validBit){
-        printf("Cache hit at set %d, block offset %d\n", setIndex, blockOffset);
-        return 1; //cache hit
+            lines[i].lastAccessTime = globalTime++; 
+            printf("Cache hit at set %d, block offset %d\n", setIndex, blockOffset);
+            return 1; //cache hit
         }
     }
 
@@ -131,7 +135,16 @@ int accessCache(Cache *cache, unsigned int addr, const char *data){
 
     //if we don't find one, replace one
     if(lineToReplace == NULL){
-        lineToReplace = randomReplacement(curSet);
+        if (strcmp(policy, "LRU") == 0) {
+            lineToReplace = leastRecentlyUsed(curSet);
+        } 
+        else if (strcmp(policy, "RANDOM") == 0) {
+            lineToReplace = randomReplacement(curSet);
+        } 
+        else {
+            printf("Error: Unknown replacement policy '%s'.\n", policy);
+            return -1;
+        }
     }
 
     //update the chosen line
@@ -140,6 +153,15 @@ int accessCache(Cache *cache, unsigned int addr, const char *data){
     return 0;
     
 
+}
+Line* leastRecentlyUsed(Set *set) {
+    Line* lruLine = &set->cacheLines[0];
+    for (int i = 1; i < set->linesPerSet; i++) {
+        if (set->cacheLines[i].lastAccessTime < lruLine->lastAccessTime) {
+            lruLine = &set->cacheLines[i];
+        }
+    }
+    return lruLine;
 }
 
 Line *randomReplacement(Set *set){
@@ -154,6 +176,7 @@ void updateCache(Line *line, int tagBits, const char *blockData) {
     // Line *line = &(cache->cacheSets[setIndex].cacheLines);
     line->validBit = true;
     line->tag = tagBits;
+    line->lastAccessTime = globalTime++; //update to current time
     strcpy(line->block, blockData);  // Copy data into cache block
 }
 

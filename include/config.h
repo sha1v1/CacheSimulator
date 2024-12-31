@@ -5,6 +5,7 @@ typedef struct {
     int numSets;
     int mainMemorySize;
     int linesPerSet;
+    char replacementPolicy[10];
 } Config;
 
 Config *readConfigFile(Config *config);
