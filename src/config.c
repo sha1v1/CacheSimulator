@@ -32,6 +32,9 @@ Config *readConfigFile(Config *config){
         else if(strcmp(key, "replacement_policy") == 0){
             strcpy(config->replacementPolicy, value);
         }
+        else if(strcmp(key,"write_policy") == 0){
+            strcpy(config->writePolicy, value);
+        }
         else{
             printf("Unknown key: %s\n", key);
             exit(1);

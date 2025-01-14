@@ -10,7 +10,7 @@ int main() {
     // Read configuration
     printf("Reading configuration...\n");
     readConfigFile(&config);
-    printf("Configuration loaded: numSets = %d\n", config.numSets);
+    printf("Configuration loaded:\nnumber of sets = %d\nlines per set = %d\nmain memory size = %d bytes\nreplacement policy = %s\nwrite policy = %s", config.numSets, config.linesPerSet, config.mainMemorySize, config.replacementPolicy, config.writePolicy);
 
     // Initialize the cache
     cache = initalizeCache(config.numSets);
@@ -28,7 +28,7 @@ int main() {
             break;
         }
 
-        int hit = accessCache(cache, address, NULL);
+        int hit = accessCache(cache, address, NULL, config.replacementPolicy);
         printf("Address 0x%X: %s\n", address, hit ? "Hit" : "Miss");
     }
     displayCache(cache);
