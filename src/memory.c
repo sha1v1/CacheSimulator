@@ -5,6 +5,16 @@
 #include <string.h>
 
 //initialize main memory
+/**
+ * @brief Initialize the Main memory Structure with user provided configuration.
+ * 
+ * @param memory A pointer to the Memory structure.
+ * @param config A pointer to the Config Structure
+ * 
+ * Sets the total memory size, page size, calculates number of pages required. It also allocates memory for
+ * the pageTable which is essentially an array of pointers to all these pages. These pointers are
+ * initialized to NULL.
+ */
 void initializeMemory(Memory *memory, Config *config){
     memory->totalSize = config->mainMemorySize;
     memory->pageSize = 256; //fixed page size
@@ -20,6 +30,20 @@ void initializeMemory(Memory *memory, Config *config){
 
 }
 
+/**
+ * @brief Allocates (initializes) a memory page at the specified index.
+ *
+ * @param memory A pointer to the Memory structure.
+ * @param pageIndex The index of the page to allocate.
+ * @return int Returns:
+ *              - 1 if the page was successfully allocated or already exists.
+ *              - -1 if the memory is uninitialized.
+ *              - -2 if the page index is out of bounds.
+ *              - -3 if page allocation failed.
+ *
+ * Checks if the page has already been allocated. If not,
+ * it dynamically allocates the page and populates it with random non-zero values.
+ */
 int allocatePage(Memory *memory, int pageIndex) {
     //check if memory has been initiliazed
     if(!memory || !memory->pageTable){
@@ -53,6 +77,15 @@ int allocatePage(Memory *memory, int pageIndex) {
     return 1;
 }
 
+
+/**
+ * @brief Given a memory address, it returns the value at the said address.
+ * @param memory A pointer to the Memory struct
+ * @param address The address to read from
+ * 
+ * cacluate the page and offset from the given address. If the page hasn't been allocated (initialized),
+ * it is dynamically polulated with random values and the value at the given address is returned. 
+*/
 int readFromMemory(Memory *memory, int address){
     if(!memory || !memory->pageTable){
         printf("Error: Attempting to write to uninitialized memory\n");
@@ -74,6 +107,16 @@ int readFromMemory(Memory *memory, int address){
     return memory->pageTable[pageIdx][offset];
 }
 
+/**
+ * @brief Writes a value to a given address in memory.
+ * 
+ * @param memory A pointer to the memory structure.
+ * @param address The address to write to
+ * @param value The value to write to that address
+ * 
+ * Calculate the page index and offset from the address. If page hasn't been allocated (initialized) yet,
+ * it is loaded with random values and the memory address is then written to with the provided value.
+ */
 int writeToMemory(Memory *memory, int address, char value){
     if(!memory || !memory->pageTable){
         printf("Error: Attempting to write to uninitialized memory\n");
@@ -103,6 +146,16 @@ int writeToMemory(Memory *memory, int address, char value){
 
 
 //since I am calling malloc inside, the caller will have to free the memory.
+/**
+ * @brief fetches a block of data (cache line) from memory.
+ * 
+ * @param memory A pointer to the Memory structure
+ * @param addr The address that triggered the fetching of the data block
+ * @returns blockData: An array containing the block data.
+ * 
+ * Figure out the starting address of the block from the given address and fetch 32 bytes of data
+ * from the computed address. In case the page hasn't been allocated yet, initialize it first.
+ */
 char *fetchBlockFromMemory(Memory *memory, unsigned int addr) {
     int blockStartAddr = addr & ~31;  // Align to block start
     char *blockData = (char *)malloc(32 * sizeof(char));
@@ -112,7 +165,15 @@ char *fetchBlockFromMemory(Memory *memory, unsigned int addr) {
     return blockData;
 }
 
-
+/**
+ * @brief Frees all memory occupied by the Memory structure.
+ *
+ * @param memory A pointer to the Memory structure to free.
+ *
+ * This function frees all allocated pages and the page table itself.
+ * After calling this, the Memory structure will be in an
+ * uninitialized state.
+ */
 void freeMemory(Memory *memory){
 
     if (!memory || !memory->pageTable) {

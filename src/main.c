@@ -28,7 +28,7 @@ int main() {
             break;
         }
 
-        int hit = accessCache(cache, address, NULL, config.replacementPolicy);
+        int hit = handleCacheAccess(cache, address, NULL, config.replacementPolicy);
         printf("Address 0x%X: %s\n", address, hit ? "Hit" : "Miss");
     }
     displayCache(cache);
