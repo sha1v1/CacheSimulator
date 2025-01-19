@@ -139,88 +139,84 @@ int getTagBits(unsigned int addr, int numSets)
 
 // }
 
+
 /**
- * @brief Accesses the Cache for the given memory address and data. Also handles line eviction/replacement.
- *
- * @param cache A pointer to the Cache structure.
- * @param addr The memory address being accessed.
- * @param data The data to write to the Cache (optional; can be NULL).
- * @param policy A string indicating the replacement policy (e.g., "LRU", "RANDOM").
- * @return int Returns:
- *              - 1 for a cache hit.
- *              - 0 for a cache miss.
- *              - -1 for an error (e.g., uninitialized cache or invalid policy).
- *
- * This function checks if the address maps to a valid line in the Cache. On a miss, it evicts
- * a line based on the specified replacement policy and updates the Cache with the new data.
+ * @brief given an address, check if we have the cached value for the same.
+ * 
+ * @param cache a pointer to the cache structure
+ * @param addr the memory address being acessed
+ * @param outData pointer to a char where the data will be written on a hit
+ * @return int:
+ *      - 1: Cache hit
+ *      - 0: Cache miss
+ *      - -1: Error
+ * 
  */
-int handleCacheAccess(Cache *cache, unsigned int addr, const char *data, const char policy[10])
-{
-    // check if pointer is valid
-    if (!cache || !cache->cacheSets)
-    {
-        printf("Error: Attempting to access an uninitialized cache.\n");
+int checkCache(Cache *cache, unsigned int addr, char* outData){
+    if(!cache || !cache->cacheSets){
+        printf("Error: cache is not initialized");
         return -1;
     }
 
-    // set index, block offset, and tag bits
     int setIndex = getSetIndex(addr, cache->numSets);
+    int tagBits = getTagBits(addr, cache->numSets);
     int blockOffset = getBlockOffset(addr);
+
+
+    Set *curSet = &(cache->cacheSets[setIndex]);
+
+    // Check all lines in the set for a hit
+    for (int i = 0; i < curSet->linesPerSet; i++) {
+        Line *line = &curSet->cacheLines[i];
+
+        if (curSet->cacheLines[i].validBit && curSet->cacheLines[i].tag == tagBits) {
+            // Cache hit: Retrieve the data at the block offset
+            if (outData) {
+                *outData = line->block[blockOffset];
+            }
+            line->lastAccessTime = globalTime++;  // Update LRU timestamp
+            // Cache hit
+            return 1;
+        }
+    }
+
+    // Cache miss
+    return 0;
+}
+
+/**
+ * @brief Find the line that needs to be replaced/updated when a cache miss occurs
+ * 
+ * @param cache a pointer to the cache structure
+ * @param addr The memory address being accessed.
+ * @param policy A string indicating the replacement policy (e.g., "LRU", "RANDOM").
+ * 
+ * @returns *Line: pointer to the line to be replaced/updated
+ */
+Line *handleLineReplacement(Cache *cache, unsigned int addr, const char policy[10]){
+    int setIndex = getSetIndex(addr, cache->numSets);
     int tagBits = getTagBits(addr, cache->numSets);
 
     Set *curSet = &(cache->cacheSets[setIndex]);
 
-    // get the lines at the corresponding set index
-    Line *lines = curSet->cacheLines;
-
-    // iterate through all lines
-    for (int i = 0; i < curSet->linesPerSet; i++)
-    {
-        // check valid bit and tagbits
-        if (lines[i].tag == tagBits && lines[i].validBit)
-        {
-            lines[i].lastAccessTime = globalTime++;
-            printf("Cache hit at set %d, block offset %d\n", setIndex, blockOffset);
-            return 1; // cache hit
+    // Find an empty line
+    for (int i = 0; i < curSet->linesPerSet; i++) {
+        if (!curSet->cacheLines[i].validBit) {
+            return &curSet->cacheLines[i];  // Return the empty line
         }
     }
 
-    printf("Cache miss at set %d\n", setIndex);
-
-    // now look for emptyline or a line to replace
-    Line *lineToReplace = NULL;
-    for (int i = 0; i < curSet->linesPerSet; i++)
-    {
-        if (!lines[i].validBit)
-        {
-            lineToReplace = &lines[i]; // Found an empty line
-            break;
-        }
+    // Apply replacement policy
+    if (strcmp(policy, "LRU") == 0) {
+        return leastRecentlyUsed(curSet);
+    } else if (strcmp(policy, "RANDOM") == 0) {
+        return randomReplacement(curSet);
     }
 
-    // if we don't find one, replace one
-    if (lineToReplace == NULL)
-    {
-        if (strcmp(policy, "LRU") == 0)
-        {
-            lineToReplace = leastRecentlyUsed(curSet);
-        }
-        else if (strcmp(policy, "RANDOM") == 0)
-        {
-            lineToReplace = randomReplacement(curSet);
-        }
-        else
-        {
-            printf("Error: Unknown replacement policy '%s'.\n", policy);
-            return -1;
-        }
-    }
-
-    // update the chosen line
-    updateCache(lineToReplace, tagBits, data);
-
-    return 0;
+    printf("Error: Unknown replacement policy '%s'\n", policy);
+    return NULL;
 }
+
 
 /**
  * @brief Given a set, find the line to be removed using the Least Recently used policy.
