@@ -48,7 +48,6 @@ void test_cacheAccess(void) {
     result = checkCache(cache, address, &outData);
     TEST_ASSERT_EQUAL(1, result);
 
-    freeCache(cache);
 }
 
 
@@ -88,7 +87,7 @@ void test_RandomReplacement(void){
     unsigned int tag2 = getTagBits(address2, 4);
     TEST_ASSERT_TRUE(replacedLine->tag == tag1 || replacedLine->tag == tag2);
 
-    freeCache(cache);
+
 }
 
 
@@ -111,7 +110,7 @@ void test_LRUReplacement(void) {
     // Verify LRU replacement
     TEST_ASSERT_EQUAL(getTagBits(address1, 4), replacedLine->tag); // Line 0 should be replaced
 
-    freeCache(cache);
+    
 }
 
 
