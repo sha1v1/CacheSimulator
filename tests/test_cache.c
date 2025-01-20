@@ -66,9 +66,9 @@ void test_update_cache(void) {
 }
 
 void test_RandomReplacement(void){
-    unsigned int address1 = 0x1234; // Maps to set 0, line 0
-    unsigned int address2 = 0x5678; // Maps to set 0, line 1
-    unsigned int address3 = 0x9ABC; // Maps to set 0, should replace a random line
+    unsigned int address1 = 0x1234; // Maps to set 1, line 0
+    unsigned int address2 = 0x00a4; // Maps to set 1, line 1
+    unsigned int address3 = 0x0234; // Maps to set 1, should replace a random line
 
     // Access first two addresses (fills both lines)
     checkCache(cache, address1, NULL);
@@ -78,14 +78,13 @@ void test_RandomReplacement(void){
     updateCache(handleLineReplacement(cache, address2, "RANDOM"), getTagBits(address2, 4), "Block2");
 
     // Access a new address to trigger replacement
-    checkCache(cache, address3, NULL);
     Line *replacedLine = handleLineReplacement(cache, address3, "RANDOM");
+    updateCache(replacedLine, getTagBits(address3, 4), "Block3");
 
     // Verify Random replacement
     // Ensure that the tag of the replaced line matches one of the first two tags
-    unsigned int tag1 = getTagBits(address1, 4);
-    unsigned int tag2 = getTagBits(address2, 4);
-    TEST_ASSERT_TRUE(replacedLine->tag == tag1 || replacedLine->tag == tag2);
+    unsigned int tag = getTagBits(address3, 4);
+    TEST_ASSERT_TRUE(cache->cacheSets[1].cacheLines[0].tag == tag || cache->cacheSets[1].cacheLines[1].tag == tag);
 
 
 }
@@ -93,8 +92,8 @@ void test_RandomReplacement(void){
 
 void test_LRUReplacement(void) {
     unsigned int address1 = 0x1234; // Maps to set 0, line 0
-    unsigned int address2 = 0x5678; // Maps to set 0, line 1
-    unsigned int address3 = 0x9ABC; // Maps to set 0, should replace line 0 (LRU)
+    unsigned int address2 = 0x00a4; // Maps to set 0, line 1
+    unsigned int address3 = 0x0234; // Maps to set 0, should replace line 0 (LRU)
 
     // Access first two addresses (fills both lines)
     checkCache(cache, address1, NULL);
@@ -103,13 +102,18 @@ void test_LRUReplacement(void) {
     checkCache(cache, address2, NULL);
     updateCache(handleLineReplacement(cache, address2, "LRU"), getTagBits(address2, 4), "Block2");
 
+    //access line 1 again to make line 0 the least recently use line
+    checkCache(cache, address2, NULL);
+
     // Access a new address to trigger replacement
     checkCache(cache, address3, NULL);
+
     Line *replacedLine = handleLineReplacement(cache, address3, "LRU");
-
-    // Verify LRU replacement
-    TEST_ASSERT_EQUAL(getTagBits(address1, 4), replacedLine->tag); // Line 0 should be replaced
-
+    updateCache(replacedLine, getTagBits(address3, 4), "Block3");
+    
+    // Verify LRU replacement, line 0 should be replaced
+    unsigned int tag = getTagBits(address3, 4);
+    TEST_ASSERT_EQUAL(tag, cache->cacheSets[1].cacheLines[0].tag); // Line 0 should be replaced
     
 }
 
