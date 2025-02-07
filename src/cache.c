@@ -28,7 +28,7 @@ void initializeSets(Set *sets, int numSets, int linesPerSet)
         sets[i].cacheLines = (Line *)malloc(linesPerSet * sizeof(Line));
         if (!sets[i].cacheLines)
         {
-            printf("Failed to allocate memory for lines in set %d", i);
+            printf("Failed to allocate memory for lines in set %d\n", i);
             exit(1);
         }
 
@@ -41,6 +41,8 @@ void initializeSets(Set *sets, int numSets, int linesPerSet)
             memset(sets[i].cacheLines[j].block, 0, sizeof(sets[i].cacheLines[j].block));
         }
     }
+
+    printf("All sets in Cache initialized\n");
 }
 
 /*
@@ -59,14 +61,14 @@ Cache *initalizeCache(Config *config)
 {
     if (!config)
     {
-        printf("Error: Configurations have not been set.");
+        printf("Error: Configurations have not been set.\n");
         return NULL;
     }
 
     Cache *cache = (Cache *)malloc(sizeof(Cache));
     if (!cache)
     {
-        printf("Failed to allocate memory for Cache");
+        printf("Failed to allocate memory for Cache\n");
         exit(1);
     }
     cache->numSets = config->numSets;
@@ -75,7 +77,7 @@ Cache *initalizeCache(Config *config)
     Set *sets = (Set *)malloc(cache->numSets * sizeof(Set));
     if (!sets)
     {
-        printf("Failed to allocate memory for sets");
+        printf("Failed to allocate memory for sets\n");
         exit(1);
     }
 
@@ -83,7 +85,7 @@ Cache *initalizeCache(Config *config)
 
     // initialize all sets
     initializeSets(cache->cacheSets, cache->numSets, cache->linesPerSet);
-
+    printf("Cache initialized.\n");
     return cache;
 }
 
@@ -154,7 +156,7 @@ int getTagBits(unsigned int addr, int numSets)
  */
 int checkCache(Cache *cache, unsigned int addr, char* outData){
     if(!cache || !cache->cacheSets){
-        printf("Error: cache is not initialized");
+        printf("Error: cache is not initialized\n");
         return -1;
     }
 

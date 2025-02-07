@@ -9,6 +9,6 @@ typedef struct {
     char writePolicy[15];
 } Config;
 
-Config *readConfigFile(Config *config);
+void readConfigFile(Config *config);
 
 #endif 

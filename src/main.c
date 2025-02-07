@@ -14,9 +14,22 @@ Cache *cache;
  */
 void init(){
     //read the config file 
+    // Allocate memory for config, memory, and cache
+    config = malloc(sizeof(Config));
+    if (!config) {
+        printf("Error: Failed to allocate memory for Config.\n");
+        exit(1);
+    }
+
+    memory = malloc(sizeof(Memory));
+    if (!memory) {
+        printf("Error: Failed to allocate memory for Memory.\n");
+        free(config);
+        exit(1);
+    }
     readConfigFile(config);
-    cache = initialeCache(config);
-    initalizeMemory(memory, config);
+    cache = initalizeCache(config);
+    initializeMemory(memory, config);
 
 
 }
@@ -43,6 +56,7 @@ char handleRead(Cache *cache, Memory *memory, unsigned int addr, const char poli
     char fetchedData;
     int hit;
     hit = checkCache(cache, addr, &fetchedData);
+            printf("here");
 
     switch(hit){
         case 1:
@@ -52,23 +66,23 @@ char handleRead(Cache *cache, Memory *memory, unsigned int addr, const char poli
             printf("Cache miss! Fetching data from memory...\n");
             char *blockData = fetchBlockFromMemory(memory, addr); // Fetch block from memory
             fetchedData = (char)readFromMemory(memory, addr);
-
+            printf("here1\n");
             if (!blockData) {
                 printf("Error: Failed to fetch block from memory.\n");
-                return;
+                return -1;
             }
 
             // Handle cache replacement for the fetched block
-            Line *lineToReplace = handleCacheReplacement(cache, addr, policy);
+            Line *lineToReplace = handleLineReplacement(cache, addr, policy);
             if (!lineToReplace) {
                 printf("Error: Cache replacement failed.\n");
                 free(blockData); // Free the block data fetched from memory
-                return;
+                return 1;
             }
 
             // Update the cache line with the fetched block
             int tagBits = getTagBits(addr, cache->numSets);
-            updateCacheLine(lineToReplace, tagBits, blockData);
+            updateCache(lineToReplace, tagBits, blockData);
 
             // Get the data at the specific block offset within the fetched block
             int blockOffset = getBlockOffset(addr);
@@ -79,7 +93,19 @@ char handleRead(Cache *cache, Memory *memory, unsigned int addr, const char poli
 
         default: // Error state
             printf("Error: Invalid cache access.\n");
-            return NULL;
+            return -1;
 
     }
+}
+
+int main(){
+    printf("here2\n");
+    init();
+        printf("here3\n");
+
+    handleRead(cache, memory, 0x001, "RANDOM");
+        printf("here2\n");
+
+    displayCache(cache);
+    return 0;
 }
