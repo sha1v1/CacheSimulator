@@ -25,6 +25,9 @@ void initializeSets(Set *sets, int numSets, int linesPerSet)
     for (int i = 0; i < numSets; i++)
     {
         sets[i].linesPerSet = linesPerSet;
+        if (sets[i].cacheLines) {
+            free(sets[i].cacheLines);
+        }
         sets[i].cacheLines = (Line *)malloc(linesPerSet * sizeof(Line));
         if (!sets[i].cacheLines)
         {
@@ -196,15 +199,21 @@ int checkCache(Cache *cache, unsigned int addr, char* outData){
  * @returns *Line: pointer to the line to be replaced/updated
  */
 Line *handleLineReplacement(Cache *cache, unsigned int addr, const char policy[10]){
+
     int setIndex = getSetIndex(addr, cache->numSets);
-    int tagBits = getTagBits(addr, cache->numSets);
 
     Set *curSet = &(cache->cacheSets[setIndex]);
-
+    
     // Find an empty line
     for (int i = 0; i < curSet->linesPerSet; i++) {
-        if (!curSet->cacheLines[i].validBit) {
-            return &curSet->cacheLines[i];  // Return the empty line
+        if (!(curSet->cacheLines[i].validBit)) {
+        printf("%d\n", setIndex);
+            Line* line =  &(curSet->cacheLines[i]);  // Return the empty line
+            printf("%p\n", line);
+            // printf("%p\n", &curSet->cacheLines);
+            return line;
+        printf("here8\n");
+            exit(1);
         }
     }
 
@@ -267,7 +276,11 @@ void updateCache(Line *line, int tagBits, const char *blockData)
     line->validBit = true;
     line->tag = tagBits;
     line->lastAccessTime = globalTime++; // update to current time
+    printf("here11\n");
+    // printf("blockData: \"%s\"\n", blockData);
+    printf("blockData length: %zu bytes\n", strlen(blockData));
     strcpy(line->block, blockData);      // Copy data into cache block
+    printf("here12");
 }
 
 /**

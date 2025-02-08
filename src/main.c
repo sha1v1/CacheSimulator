@@ -74,6 +74,8 @@ char handleRead(Cache *cache, Memory *memory, unsigned int addr, const char poli
 
             // Handle cache replacement for the fetched block
             Line *lineToReplace = handleLineReplacement(cache, addr, policy);
+            printf("%p\n", lineToReplace);
+            printf("here4\n");
             if (!lineToReplace) {
                 printf("Error: Cache replacement failed.\n");
                 free(blockData); // Free the block data fetched from memory
@@ -82,10 +84,11 @@ char handleRead(Cache *cache, Memory *memory, unsigned int addr, const char poli
 
             // Update the cache line with the fetched block
             int tagBits = getTagBits(addr, cache->numSets);
+            printf("here5\n");
             updateCache(lineToReplace, tagBits, blockData);
-
             // Get the data at the specific block offset within the fetched block
             int blockOffset = getBlockOffset(addr);
+            printf("Block offset: %d\n", blockOffset);
             printf("Data at address 0x%X (loaded from memory): %d\n", addr, blockData[blockOffset]);
 
             free(blockData); // Free the block data
@@ -103,7 +106,7 @@ int main(){
     init();
         printf("here3\n");
 
-    handleRead(cache, memory, 0x001, "RANDOM");
+    handleRead(cache, memory, 0x100, "RANDOM");
         printf("here2\n");
 
     displayCache(cache);

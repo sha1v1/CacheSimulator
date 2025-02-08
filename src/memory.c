@@ -69,7 +69,7 @@ int allocatePage(Memory *memory, int pageIndex) {
 
         // Populate with random non-zero values
         for (int i = 0; i < memory->pageSize; i++) {
-            memory->pageTable[pageIndex][i] = (rand() % 255) + 1;  // Values between 1 and 255
+            memory->pageTable[pageIndex][i] = 32 + (rand() % (126 - 32 + 1));  // ASCII range [32, 126]
         }
 
         printf("Page %d allocated and initialized.\n", pageIndex);
@@ -159,9 +159,10 @@ int writeToMemory(Memory *memory, int address, char value){
 char *fetchBlockFromMemory(Memory *memory, unsigned int addr) {
     int blockStartAddr = addr & ~31;  // Align to block start
     char *blockData = (char *)malloc(32 * sizeof(char));
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 31; i++) {
         blockData[i] = readFromMemory(memory, blockStartAddr + i);
     }
+    blockData[31] = '\0';
     return blockData;
 }
 
