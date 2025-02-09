@@ -25,9 +25,9 @@ void initializeSets(Set *sets, int numSets, int linesPerSet)
     for (int i = 0; i < numSets; i++)
     {
         sets[i].linesPerSet = linesPerSet;
-        if (sets[i].cacheLines) {
-            free(sets[i].cacheLines);
-        }
+        // if (sets[i].cacheLines) {
+        //     free(sets[i].cacheLines);
+        // }
         sets[i].cacheLines = (Line *)malloc(linesPerSet * sizeof(Line));
         if (!sets[i].cacheLines)
         {
@@ -198,7 +198,7 @@ int checkCache(Cache *cache, unsigned int addr, char* outData){
  * 
  * @returns *Line: pointer to the line to be replaced/updated
  */
-Line *handleLineReplacement(Cache *cache, unsigned int addr, const char policy[10]){
+Line *handleLineReplacement(Cache *cache, unsigned int addr, const char *policy){
 
     int setIndex = getSetIndex(addr, cache->numSets);
 

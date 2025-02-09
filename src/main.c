@@ -172,7 +172,7 @@ int run(){
             
             case 4:
                 printf("Exiting Cache Simulator...\n");
-                break;
+                return 0;
             
             default:
                 printf("Invalid choice. Try again\n");

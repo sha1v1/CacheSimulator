@@ -30,7 +30,7 @@ int getSetIndex(unsigned int addr, int numSets);
 int getBlockOffset(unsigned int addr);
 int getTagBits(unsigned int addr, int numSets);
 int checkCache(Cache *cache, unsigned int addr, char* outData);
-Line *handleLineReplacement(Cache *cache, unsigned int addr, const char policy[10]);
+Line *handleLineReplacement(Cache *cache, unsigned int addr, const char *policy);
 Line *randomReplacement(Set *set);
 Line* leastRecentlyUsed(Set *set);
 void updateCache(Line *line, int tagBits, const char *blockData);
