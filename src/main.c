@@ -120,7 +120,7 @@ void handleWrite(Cache *cache, Memory *memory, unsigned int addr, char value) {
             if (line->validBit && line->tag == tagBits) {
                 line->block[blockOffset] = value; 
                 line->lastAccessTime = globalTime++;
-                printf("🔄 Data written to cache at address 0x%X\n", addr);
+                printf("data written to cache at address 0x%X\n", addr);
                 break;
             }
         }
@@ -143,6 +143,7 @@ int run(){
 
     while(1){
         int choice; //users selection
+        printf("\nEnter your choice: ");
         scanf("%d", &choice);
         unsigned int addr;
         char valueToBeWritten;
@@ -176,6 +177,7 @@ int run(){
             
             default:
                 printf("Invalid choice. Try again\n");
+                break;
 
         }
     }
@@ -188,9 +190,8 @@ int run(){
 
 int main(){
     srand(time(NULL));
-    // printf("here2\n");
+    
     init();
-        // printf("here3\n");
 
     run();
     return 0;

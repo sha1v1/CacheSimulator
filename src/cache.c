@@ -276,11 +276,8 @@ void updateCache(Line *line, int tagBits, const char *blockData)
     line->validBit = true;
     line->tag = tagBits;
     line->lastAccessTime = globalTime++; // update to current time
-    printf("here11\n");
-    // printf("blockData: \"%s\"\n", blockData);
-    printf("blockData length: %zu bytes\n", strlen(blockData));
+
     strcpy(line->block, blockData);      // Copy data into cache block
-    printf("here12");
 }
 
 /**
