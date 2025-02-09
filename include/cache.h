@@ -3,16 +3,17 @@
 #include <stdbool.h>
 #include "memory.h"
 
+extern unsigned int globalTime;
 
 typedef struct {
     bool validBit;
-    unsigned int tag;
+    unsigned int tag;   
     char block[32];
     unsigned int lastAccessTime;
 } Line;
 
 typedef struct {
-    Line *cacheLines; //just one coz direct mapped
+    Line *cacheLines; //pointer to array of lines
     int linesPerSet;
 } Set;
 
