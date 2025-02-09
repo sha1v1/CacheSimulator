@@ -25,10 +25,13 @@ void initializeSets(Set *sets, int numSets, int linesPerSet)
     for (int i = 0; i < numSets; i++)
     {
         sets[i].linesPerSet = linesPerSet;
+        // if (sets[i].cacheLines) {
+        //     free(sets[i].cacheLines);
+        // }
         sets[i].cacheLines = (Line *)malloc(linesPerSet * sizeof(Line));
         if (!sets[i].cacheLines)
         {
-            printf("Failed to allocate memory for lines in set %d", i);
+            printf("Failed to allocate memory for lines in set %d\n", i);
             exit(1);
         }
 
@@ -41,6 +44,8 @@ void initializeSets(Set *sets, int numSets, int linesPerSet)
             memset(sets[i].cacheLines[j].block, 0, sizeof(sets[i].cacheLines[j].block));
         }
     }
+
+    printf("All sets in Cache initialized\n");
 }
 
 /*
@@ -59,14 +64,14 @@ Cache *initalizeCache(Config *config)
 {
     if (!config)
     {
-        printf("Error: Configurations have not been set.");
+        printf("Error: Configurations have not been set.\n");
         return NULL;
     }
 
     Cache *cache = (Cache *)malloc(sizeof(Cache));
     if (!cache)
     {
-        printf("Failed to allocate memory for Cache");
+        printf("Failed to allocate memory for Cache\n");
         exit(1);
     }
     cache->numSets = config->numSets;
@@ -75,7 +80,7 @@ Cache *initalizeCache(Config *config)
     Set *sets = (Set *)malloc(cache->numSets * sizeof(Set));
     if (!sets)
     {
-        printf("Failed to allocate memory for sets");
+        printf("Failed to allocate memory for sets\n");
         exit(1);
     }
 
@@ -83,7 +88,7 @@ Cache *initalizeCache(Config *config)
 
     // initialize all sets
     initializeSets(cache->cacheSets, cache->numSets, cache->linesPerSet);
-
+    printf("Cache initialized.\n");
     return cache;
 }
 
@@ -154,7 +159,7 @@ int getTagBits(unsigned int addr, int numSets)
  */
 int checkCache(Cache *cache, unsigned int addr, char* outData){
     if(!cache || !cache->cacheSets){
-        printf("Error: cache is not initialized");
+        printf("Error: cache is not initialized\n");
         return -1;
     }
 
@@ -193,16 +198,22 @@ int checkCache(Cache *cache, unsigned int addr, char* outData){
  * 
  * @returns *Line: pointer to the line to be replaced/updated
  */
-Line *handleLineReplacement(Cache *cache, unsigned int addr, const char policy[10]){
+Line *handleLineReplacement(Cache *cache, unsigned int addr, const char *policy){
+
     int setIndex = getSetIndex(addr, cache->numSets);
-    int tagBits = getTagBits(addr, cache->numSets);
 
     Set *curSet = &(cache->cacheSets[setIndex]);
-
+    
     // Find an empty line
     for (int i = 0; i < curSet->linesPerSet; i++) {
-        if (!curSet->cacheLines[i].validBit) {
-            return &curSet->cacheLines[i];  // Return the empty line
+        if (!(curSet->cacheLines[i].validBit)) {
+        printf("%d\n", setIndex);
+            Line* line =  &(curSet->cacheLines[i]);  // Return the empty line
+            printf("%p\n", line);
+            // printf("%p\n", &curSet->cacheLines);
+            return line;
+        printf("here8\n");
+            exit(1);
         }
     }
 
@@ -265,7 +276,11 @@ void updateCache(Line *line, int tagBits, const char *blockData)
     line->validBit = true;
     line->tag = tagBits;
     line->lastAccessTime = globalTime++; // update to current time
+    printf("here11\n");
+    // printf("blockData: \"%s\"\n", blockData);
+    printf("blockData length: %zu bytes\n", strlen(blockData));
     strcpy(line->block, blockData);      // Copy data into cache block
+    printf("here12");
 }
 
 /**

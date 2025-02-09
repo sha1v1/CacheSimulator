@@ -2,13 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 
-Config *readConfigFile(Config *config){
+
+void readConfigFile(Config *config){
+
+    char cwd[1024];
+if (getcwd(cwd, sizeof(cwd)) != NULL) {
+    printf("Current working directory: %s\n", cwd);
+}
+
     //open config file
     FILE* configFile = fopen("config.txt", "r");
     if(!configFile){
-        printf("Could not open config.txt");
+        printf("Could not open config.txt\n");
         exit(1);
     }
     
@@ -22,18 +30,23 @@ Config *readConfigFile(Config *config){
         sscanf(buffer, "%24[^=]=%24s", key, value);
         if(strcmp(key, "num_sets") == 0){
             config->numSets = atoi(value);
+            printf("Read the number of sets\n");
         }
         else if(strcmp(key, "main_memory_size") == 0){
             config->mainMemorySize = atoi(value);
+            printf("Red main memory size\n");
         }
         else if(strcmp(key, "lines_per_set") == 0){
             config->linesPerSet = atoi(value);
+            printf("read lines per set\n");
         }
         else if(strcmp(key, "replacement_policy") == 0){
             strcpy(config->replacementPolicy, value);
+            printf("Read the replacement policy\n");
         }
         else if(strcmp(key,"write_policy") == 0){
             strcpy(config->writePolicy, value);
+            printf("read write policy\n");
         }
         else{
             printf("Unknown key: %s\n", key);
@@ -41,6 +54,6 @@ Config *readConfigFile(Config *config){
         }
 
     }
-    return config;
-
+    printf("Read config file.\n");
+    return;
 }

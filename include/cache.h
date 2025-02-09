@@ -3,16 +3,17 @@
 #include <stdbool.h>
 #include "memory.h"
 
+extern unsigned int globalTime;
 
 typedef struct {
     bool validBit;
-    unsigned int tag;
+    unsigned int tag;   
     char block[32];
     unsigned int lastAccessTime;
 } Line;
 
 typedef struct {
-    Line *cacheLines; //just one coz direct mapped
+    Line *cacheLines; //pointer to array of lines
     int linesPerSet;
 } Set;
 
@@ -29,7 +30,7 @@ int getSetIndex(unsigned int addr, int numSets);
 int getBlockOffset(unsigned int addr);
 int getTagBits(unsigned int addr, int numSets);
 int checkCache(Cache *cache, unsigned int addr, char* outData);
-Line *handleLineReplacement(Cache *cache, unsigned int addr, const char policy[10]);
+Line *handleLineReplacement(Cache *cache, unsigned int addr, const char *policy);
 Line *randomReplacement(Set *set);
 Line* leastRecentlyUsed(Set *set);
 void updateCache(Line *line, int tagBits, const char *blockData);

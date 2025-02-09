@@ -27,7 +27,7 @@ void test_initialize_memory(){
 
 void test_read_from_memory(void){
     char value = readFromMemory(&memory, 500);
-    TEST_ASSERT(value >= 1 && value <= 255);
+    TEST_ASSERT(value >= 32 && value <= 126);
 }
 
 void test_write_to_memory(void){
