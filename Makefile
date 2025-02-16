@@ -3,8 +3,8 @@ CFLAGS = -Wall -Werror -O2
 
 SRCDIR = src
 
-SRCS = $(SRCDIR)/main.c $(SRCDIR)/cache.c $(SRCDIR)/config.c
-OBJS = main.o cache.o config.o
+SRCS = $(SRCDIR)/main.c $(SRCDIR)/cache.c $(SRCDIR)/config.c $(SCRDIR)/memory.c
+OBJS = main.o cache.o config.o memory.o
 TARGET = cache_sim
 
 all: $(TARGET)
