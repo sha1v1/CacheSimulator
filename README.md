@@ -17,7 +17,7 @@ make
 ## Usage
 Run the program using
 ```
-./cache_sim
+./build/cache_sim
 ```
 
 You'll be presented with a menu:
