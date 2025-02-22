@@ -13,7 +13,7 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 $(TARGET): $(BUILDDIR) $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) -lm
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
