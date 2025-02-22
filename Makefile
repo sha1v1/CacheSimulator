@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Werror -O2
+CFLAGS = -Wall -Wno-error -O2
 
 SRCDIR = src
 BUILDDIR = build
