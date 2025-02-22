@@ -9,30 +9,45 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      # Step 1: Checkout code
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Set up build environment
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y gcc make
 
-      # Step 3: Compile memory tests
-      - name: Compile Tests
-        run: gcc -o test_memory tests/test_memory.c src/memory.c src/unity/unity.c
+      - name: Build Project
+        run: make
 
-      # Step 4: Run memory tests
-      - name: Run Tests
-        run: ./test_memory
-      
-      # Step 5: Compile cache tests
-      - name: Compile Cache Tests
-        run: gcc -o test_cache tests/test_cache.c src/cache.c src/unity/unity.c -Iinclude -lm
+  memory-test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      # Step 6: Run cache tests
-      - name: Run Cache Tests
-        run: ./test_cache
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcc make
+
+      - name: Compile and Run Memory Tests
+        run: |
+          gcc -o test_memory tests/test_memory.c src/memory.c src/unity/unity.c
+          ./test_memory
+
+  cache-test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcc make
+
+      - name: Compile and Run Cache Tests
+        run: |
+          gcc -o test_cache tests/test_cache.c src/cache.c src/unity/unity.c -Iinclude -lm
+          ./test_cache
