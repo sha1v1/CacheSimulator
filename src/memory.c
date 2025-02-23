@@ -157,6 +157,11 @@ int writeToMemory(Memory *memory, int address, char value){
  * from the computed address. In case the page hasn't been allocated yet, initialize it first.
  */
 char *fetchBlockFromMemory(Memory *memory, unsigned int addr) {
+    if(addr >= memory->totalSize|| addr < 0){
+        printf("Invalid Memory address %d\n", addr);
+        exit(0);
+    }
+
     int blockStartAddr = addr & ~31;  // Align to block start
     char *blockData = (char *)malloc(32 * sizeof(char));
     for (int i = 0; i < 31; i++) {
