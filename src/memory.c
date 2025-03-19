@@ -156,21 +156,25 @@ int writeToMemory(Memory *memory, int address, char value){
  * Figure out the starting address of the block from the given address and fetch 32 bytes of data
  * from the computed address. In case the page hasn't been allocated yet, initialize it first.
  */
-char *fetchBlockFromMemory(Memory *memory, unsigned int addr) {
-    if(addr >= memory->totalSize|| addr < 0){
-        printf("Invalid Memory address %d\n", addr);
-        exit(0);
+int fetchBlockFromMemory(Memory *memory, unsigned int addr, char** blockData) {
+    if(addr >= memory->totalSize){
+        fprintf(stderr, "Invalid Memory address %u\n", addr);
+        return -1;
     }
 
     int blockStartAddr = addr & ~31;  // Align to block start
-    char *blockData = (char *)malloc(32 * sizeof(char));
-    for (int i = 0; i < 31; i++) {
-        blockData[i] = readFromMemory(memory, blockStartAddr + i);
+    *blockData = malloc(32 * sizeof(char));
+    if (!*blockData) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return -3; // Erroneous fetch attempt: malloc failed
     }
-    blockData[31] = '\0';
-    return blockData;
+    
+    for (int i = 0; i < 32; i++) {
+        (*blockData)[i] = readFromMemory(memory, blockStartAddr + i);
+    }
+    (*blockData)[31] = '\0';
+    return 0; // for success
 }
-
 /**
  * @brief Frees all memory occupied by the Memory structure.
  *

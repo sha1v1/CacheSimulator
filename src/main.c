@@ -66,7 +66,12 @@ char handleRead(Cache *cache, Memory *memory, unsigned int addr, const char poli
         
         case 0:
             printf("Cache miss! Fetching data from memory...\n");
-            char *blockData = fetchBlockFromMemory(memory, addr); // Fetch block from memory
+            char *blockData = NULL;
+            int err = fetchBlockFromMemory(memory, addr, &blockData); // Fetch block from memory
+            if(err != 0){
+                printf("Error: Failed to fetch block from memory (error code %d).\n", err);
+                return err;
+            }
             fetchedData = (char)readFromMemory(memory, addr);
 
             if (!blockData) {
